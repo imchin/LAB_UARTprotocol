@@ -46,6 +46,10 @@ DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 uint8_t RxBuffer[32]={0};
+uint8_t Posdata=0;
+uint8_t Posdatapre=0;
+void pim(char q[]);
+uint8_t TxDataBuffer[32]={0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -104,11 +108,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+	  Posdata=huart2.RxXferSize-huart2.hdmarx->Instance->NDTR;
+	  if(Posdata!=Posdatapre ){
+		  sprintf(TxDataBuffer, "\r\nReceivedChar:[%c]", RxBuffer[Posdatapre] );
+		  HAL_UART_Transmit(&huart2, (uint8_t*)TxDataBuffer, strlen(TxDataBuffer),500);
+		  Posdatapre=(Posdatapre+1)%32;
+	  }
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -240,7 +250,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void pim(char q[]){
 
+	HAL_UART_Transmit(&huart2, (uint8_t*)q, strlen(q),1000);
+}
 
 /* USER CODE END 4 */
 
